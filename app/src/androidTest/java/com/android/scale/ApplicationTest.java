@@ -1,4 +1,4 @@
-package com.android.mmadhusoodan.masterblaster;
+package com.android.scale;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;
