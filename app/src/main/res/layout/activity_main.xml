@@ -19,18 +19,20 @@
                 android:layout_weight="1"
                 android:background="#bbb6b6">
 
-            <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/textView1"
-                    android:text="Downloaded Image"/>
-
             <ImageView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:id="@+id/imageView1"
                     android:contentDescription="Image"
-                    android:layout_weight="1"/>
+                    android:layout_weight="2"/>
+
+            <TextView
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/textView1"
+                    android:text="Downloaded Image"
+                    android:foreground="#eb0d0d"
+                    android:textColor="#070707"/>
 
         </LinearLayout>
 
@@ -42,17 +44,18 @@
                 android:layout_weight="1"
                 android:background="#bbb6b6">
 
-            <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/textView2"
-                    android:text="Database Image"/>
-
             <ImageView
                     android:layout_width="fill_parent"
                     android:layout_height="fill_parent"
                     android:id="@+id/imageView2"
-                    android:layout_weight="1"/>
+                    android:layout_weight="2"/>
+
+            <TextView
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/textView2"
+                    android:text="Database Image"
+                    android:textColor="#070707"/>
 
         </LinearLayout>
     </LinearLayout>
@@ -70,14 +73,14 @@
                 android:layout_height="wrap_content"
                 android:text="Download"
                 android:background="#c9cfcf"
-                android:onClick="downloadSaveAndDisplayImage"/>
+                android:onClick="downloadSaveAndDisplayImage"
+                android:textColor="#010101"/>
 
         <Button
                 android:id="@+id/clear"
                 android:layout_weight="1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Clear"
                 android:background="#c9cfcf"/>
 
         <Button
@@ -88,7 +91,8 @@
                 android:layout_gravity="fill_vertical"
                 android:text="Display"
                 android:background="#c9cfcf"
-                android:onClick="fetchDBAndDisplayImage"/>
+                android:onClick="fetchAndDisplayImage"
+                android:textColor="#010101"/>
     </LinearLayout>
 
 </LinearLayout>

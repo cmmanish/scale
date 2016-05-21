@@ -27,7 +27,7 @@ public class MainActivity extends Activity {
     private ImageView imageView1, imageView2;
     private TextView textView1, textView2;
     private SQLiteDatabase db;
-    private String str = "KOHLI";
+    private String str = "PLAYBOLD";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,7 +39,7 @@ public class MainActivity extends Activity {
 
         db = this.openOrCreateDatabase("image.db", Context.MODE_PRIVATE, null);
         DatabaseHandler databaseHandler = new DatabaseHandler(getApplicationContext());
-        Log.i(TAG, "Database " + databaseHandler.checkDataBase(db));
+        Log.i(TAG, "Database " + databaseHandler.checkDataBase());
 
         imageView1 = (ImageView) findViewById(R.id.imageView1);
         textView1 = (TextView) findViewById(R.id.textView1);
@@ -52,15 +52,15 @@ public class MainActivity extends Activity {
         try {
             Instagram4J instagram4J = new Instagram4J();
             ArrayList<Bitmap> imageList = instagram4J.getBitmapsFromTagSearch(str);
-            insertImage(imageList.get(0));
+            insertImage(imageList.get(1));
             Toast.makeText(this, "Insert Success", Toast.LENGTH_SHORT).show();
-            imageView1.setImageBitmap(imageList.get(0));
+            imageView1.setImageBitmap(imageList.get(2));
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public void fetchDBAndDisplayImage(View view) {
+    public void fetchAndDisplayImage(View view) {
         try {
             db = openOrCreateDatabase("image.db", Context.MODE_PRIVATE, null);
             Cursor c = db.rawQuery("select * from image_table ORDER BY _id DESC", null);

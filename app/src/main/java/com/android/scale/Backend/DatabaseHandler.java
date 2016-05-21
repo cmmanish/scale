@@ -28,6 +28,49 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         this.myContext = context;
     }
 
+    public boolean doesTableExist(SQLiteDatabase db, String tableName) {
+        Cursor cursor = db.rawQuery("select DISTINCT tbl_name from sqlite_master where tbl_name = '" + tableName + "'", null);
+
+        if (cursor != null) {
+            if (cursor.getCount() > 0) {
+                cursor.close();
+                return true;
+            }
+            cursor.close();
+        }
+        return false;
+    }
+
+    public boolean checkDataBase() {
+        SQLiteDatabase checkDB = null;
+        try {
+            File database = myContext.getDatabasePath(DB_NAME);
+            if (database.exists()) {
+                Log.i("Database", "Found");
+                String myPath = database.getAbsolutePath();
+                Log.i("Database Path", myPath);
+                checkDB = SQLiteDatabase.openDatabase(myPath, null, SQLiteDatabase.OPEN_READWRITE);
+
+                if (doesTableExist(checkDB, "image_table")) {
+                    Cursor c = checkDB.rawQuery("SELECT * FROM image_table ", null);
+                    Log.d(TAG, "DB has " + c.getCount() + " rows ");
+                } else {
+                    Log.i("TABLE", "Not Found");
+                    Cursor c = checkDB.rawQuery(SQL_CREATE_ENTRIES, null);
+                    Log.d(TAG, "DB has " + c.getCount() + " rows ");
+                }
+            } else {
+                // Database does not exist so copy it from assets here
+                Log.i("Database", "Not Found");
+            }
+        } catch (SQLiteException e) {
+            e.printStackTrace();
+            Log.i("Database", "Not Found");
+        }
+        return checkDB != null ? true : false;
+    }
+
+
     public boolean checkDataBase(SQLiteDatabase db) {
         try {
             String DB_FULL_PATH = DB_PATH + DB_NAME;
