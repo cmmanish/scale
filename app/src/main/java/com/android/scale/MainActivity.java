@@ -28,6 +28,9 @@ public class MainActivity extends Activity {
     private TextView textView1, textView2;
     private SQLiteDatabase db;
     private String str = "PLAYBOLD";
+    Instagram4J instagram4J = new Instagram4J();
+    ArrayList<Bitmap> imageList = null;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,9 +39,13 @@ public class MainActivity extends Activity {
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
         setContentView(R.layout.activity_main);
+        imageList = instagram4J.getBitmapsFromTagSearch(str);
+        insertImage(imageList.get(1));
 
         db = this.openOrCreateDatabase("image.db", Context.MODE_PRIVATE, null);
         DatabaseHandler databaseHandler = new DatabaseHandler(getApplicationContext());
+        //Log.i(TAG, "Database Dropped " + databaseHandler.dropTable(db));
+
         Log.i(TAG, "Database " + databaseHandler.checkDataBase());
 
         imageView1 = (ImageView) findViewById(R.id.imageView1);
@@ -50,11 +57,9 @@ public class MainActivity extends Activity {
 
     public void downloadSaveAndDisplayImage(View view) {
         try {
-            Instagram4J instagram4J = new Instagram4J();
-            ArrayList<Bitmap> imageList = instagram4J.getBitmapsFromTagSearch(str);
-            insertImage(imageList.get(1));
             Toast.makeText(this, "Insert Success", Toast.LENGTH_SHORT).show();
             imageView1.setImageBitmap(imageList.get(2));
+            db.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -70,6 +75,7 @@ public class MainActivity extends Activity {
                 imageView2.setImageBitmap(bmp);
                 Toast.makeText(this, "DISPLAY Success", Toast.LENGTH_SHORT).show();
             }
+            db.close();
         } catch (Exception e) {
             e.printStackTrace();
         }

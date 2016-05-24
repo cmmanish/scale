@@ -71,18 +71,19 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
 
-    public boolean checkDataBase(SQLiteDatabase db) {
+    public boolean dropTable(SQLiteDatabase db) {
         try {
             String DB_FULL_PATH = DB_PATH + DB_NAME;
             File file = new File(DB_FULL_PATH);
             if (file.exists()) {
                 Log.d(TAG, "DB found ");
-                Cursor c = db.rawQuery("SELECT * FROM image_table ", null);
-                Log.d(TAG, "DB has " + c.getCount() + " rows ");
+                Cursor c = db.rawQuery("DROP TABLE image_table ", null);
+                Log.d(TAG, "TABLE DRPOPPED ");
             } else {
                 Log.d(TAG, "No DB found ");
-                db.rawQuery(SQL_CREATE_ENTRIES, null);
+                Cursor c = db.rawQuery("DROP TABLE image_table ", null);
             }
+            db.close();
             return true;
         } catch (SQLiteException e) {
             e.printStackTrace();
