@@ -32,7 +32,8 @@
                     android:id="@+id/textView1"
                     android:text="Downloaded Image"
                     android:foreground="#eb0d0d"
-                    android:textColor="#070707"/>
+                    android:textColor="#070707"
+                    android:gravity="center"/>
 
         </LinearLayout>
 
@@ -55,7 +56,8 @@
                     android:layout_height="wrap_content"
                     android:id="@+id/textView2"
                     android:text="Database Image"
-                    android:textColor="#070707"/>
+                    android:textColor="#070707"
+                    android:gravity="center"/>
 
         </LinearLayout>
     </LinearLayout>
@@ -71,17 +73,10 @@
                 android:layout_weight="1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Download"
+                android:text="Download n Display"
                 android:background="#c9cfcf"
                 android:onClick="downloadSaveAndDisplayImage"
                 android:textColor="#010101"/>
-
-        <Button
-                android:id="@+id/clear"
-                android:layout_weight="1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="#c9cfcf"/>
 
         <Button
                 android:id="@+id/display"
@@ -89,7 +84,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="fill_vertical"
-                android:text="Display"
+                android:text="Fetch n Display"
                 android:background="#c9cfcf"
                 android:onClick="fetchAndDisplayImage"
                 android:textColor="#010101"/>
