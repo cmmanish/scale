@@ -5,6 +5,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteStatement;
 import android.graphics.*;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.drawable.BitmapDrawable;
@@ -32,7 +33,7 @@ public class MainActivity extends Activity {
     private ImageView imageView1, imageView2;
     private TextView textView1, textView2;
     private SQLiteDatabase db;
-    private String str = "VIRAT";
+    private String str = "SachinTendulkar";
     private Instagram4J instagram4J = new Instagram4J();
     private ArrayList<Bitmap> imageList = null;
 
@@ -57,8 +58,10 @@ public class MainActivity extends Activity {
         try {
             imageList = instagram4J.getBitmapsFromTagSearch(str);
             Log.i(TAG, "Row Number " + insertImage(imageList.get(2)));
-            Bitmap myBitmap = imageList.get(2);
 
+            insertMultipleImages(imageList);
+
+            Bitmap myBitmap = imageList.get(2);
             imageView1 = (ImageView) findViewById(R.id.imageView1);
             imageView1.setImageBitmap(myBitmap);
 
@@ -129,6 +132,30 @@ public class MainActivity extends Activity {
         } catch (Exception e) {
             e.printStackTrace();
             return -1;
+        } finally {
+            db.close();
+        }
+    }
+
+    public boolean insertMultipleImages(ArrayList<Bitmap> imageList) {
+        try {
+            db = openOrCreateDatabase("image.db", Context.MODE_PRIVATE, null);
+            String sql = "INSERT INTO image_table ('image')" + "VALUES (?);";
+            SQLiteStatement statement = db.compileStatement(sql);
+            db.beginTransaction();
+            for (int i = 0; i < imageList.size(); i++) {
+                Bitmap myImage = imageList.get(i);
+                byte[] data = getBitmapAsByteArray(myImage);
+                statement.clearBindings();
+                statement.bindBlob(1, data);
+                statement.execute();
+            }
+            db.setTransactionSuccessful();
+            db.endTransaction();
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
         } finally {
             db.close();
         }

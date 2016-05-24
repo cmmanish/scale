@@ -117,6 +117,30 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
     }
 
+//    public int insertMultipleRows() throws SQLException {
+    //        try {
+    //            SQLiteDatabase db = this.getReadableDatabase();
+    //            Log.d(TAG, "Database Location :" + db.getPath());
+    //            String countQuery = "SELECT count(*) FROM image_table ";
+    //            Log.d(TAG, "QUERY:" + countQuery);
+    //
+    //            Cursor cursor = db.rawQuery(countQuery, null);
+    //            if (cursor.moveToFirst()) {
+    //                do {
+    //                    String trend = cursor.getString(1);
+    //                    arrayList.add(trend);
+    //                } while (cursor.moveToNext());
+    //            }
+    //            cursor.close();
+    //            db.close();
+    //            Log.d(TAG, "Row Count: " + arrayList.size());
+    //            return arrayList.size();
+    //        } catch (Exception e) {
+    //            e.printStackTrace();
+    //            return -1;
+    //        }
+    //    }
+
     @Override
     public void onCreate(SQLiteDatabase db) {
 
