@@ -75,7 +75,7 @@
                 android:layout_height="wrap_content"
                 android:text="Download n Display"
                 android:background="#c9cfcf"
-                android:onClick="downloadSaveAndDisplayImage"
+                android:onClick="detectFaceInTheImage"
                 android:textColor="#010101"/>
 
         <Button
