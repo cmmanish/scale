@@ -27,7 +27,7 @@ public class MainActivity extends Activity {
     private ImageView imageView1, imageView2;
     private TextView textView1, textView2;
     private SQLiteDatabase db;
-    private String str = "PLAYBOLD";
+    private String str = "VIRAT";
     Instagram4J instagram4J = new Instagram4J();
     ArrayList<Bitmap> imageList = null;
 
@@ -39,8 +39,6 @@ public class MainActivity extends Activity {
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
         setContentView(R.layout.activity_main);
-        imageList = instagram4J.getBitmapsFromTagSearch(str);
-        insertImage(imageList.get(1));
 
         db = this.openOrCreateDatabase("image.db", Context.MODE_PRIVATE, null);
         DatabaseHandler databaseHandler = new DatabaseHandler(getApplicationContext());
@@ -57,6 +55,8 @@ public class MainActivity extends Activity {
 
     public void downloadSaveAndDisplayImage(View view) {
         try {
+            imageList = instagram4J.getBitmapsFromTagSearch(str);
+            Log.i(TAG, "Row Number " + insertImage(imageList.get(2)));
             Toast.makeText(this, "Insert Success", Toast.LENGTH_SHORT).show();
             imageView1.setImageBitmap(imageList.get(2));
             db.close();
@@ -81,7 +81,7 @@ public class MainActivity extends Activity {
         }
     }
 
-    public void insertImage(Bitmap img) {
+    public long insertImage(Bitmap img) {
 
         byte[] data = getBitmapAsByteArray(img);
         ContentValues values = new ContentValues();
@@ -94,8 +94,10 @@ public class MainActivity extends Activity {
             } else {
                 Log.i(TAG, "IMAGE INSERTED IN DB");
             }
+            return rowid;
         } catch (Exception e) {
             e.printStackTrace();
+            return -1;
         } finally {
             db.close();
         }
