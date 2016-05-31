@@ -30,9 +30,8 @@
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:id="@+id/textView1"
-                    android:text="Downloaded Image"
+                    android:text="Actual Image"
                     android:foreground="#eb0d0d"
-                    android:textColor="#070707"
                     android:gravity="center"/>
 
         </LinearLayout>
@@ -55,7 +54,7 @@
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:id="@+id/textView2"
-                    android:text="Database Image"
+                    android:text="Processed Image"
                     android:textColor="#070707"
                     android:gravity="center"/>
 
@@ -73,9 +72,9 @@
                 android:layout_weight="1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Download n Display"
+                android:text="Fetch n Display"
                 android:background="#c9cfcf"
-                android:onClick="detectFaceInTheImage"
+                android:onClick="fetchAndDisplayImage"
                 android:textColor="#010101"/>
 
         <Button
@@ -84,9 +83,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="fill_vertical"
-                android:text="Fetch n Display"
+                android:text="Detect Face"
                 android:background="#c9cfcf"
-                android:onClick="fetchAndDisplayImage"
+                android:onClick="detectFaceInTheImage"
                 android:textColor="#010101"/>
     </LinearLayout>
 

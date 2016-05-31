@@ -6,31 +6,31 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.Log;
 
 import java.io.File;
-import java.util.ArrayList;
+import java.util.Random;
 
 /**
  * Created by mmadhusoodan on 5/19/16.
  */
-public class DatabaseHandler extends SQLiteOpenHelper {
+public class DataBaseHelper extends SQLiteOpenHelper {
 
-    private static final String TAG = "Log-Messages";
+    private static final String TAG = "Log-DataBaseHelper";
     private static String DB_PATH = "/data/data/com.android.scale/databases/";
-
     private static String DB_NAME = "image.db";
     private final Context myContext;
-    String SQL_CREATE_ENTRIES = "CREATE TABLE image_table (_id INTEGER PRIMARY KEY AUTOINCREMENT,image BLOB)";
+    private String SQL_CREATE_ENTRIES = "CREATE TABLE image_table (_id INTEGER PRIMARY KEY AUTOINCREMENT,image BLOB)";
 
-    public DatabaseHandler(Context context) {
+    public DataBaseHelper(Context context) {
         super(context, DB_NAME, null, 1);
         this.myContext = context;
     }
 
     public boolean doesTableExist(SQLiteDatabase db, String tableName) {
         Cursor cursor = db.rawQuery("select DISTINCT tbl_name from sqlite_master where tbl_name = '" + tableName + "'", null);
-
         if (cursor != null) {
             if (cursor.getCount() > 0) {
                 cursor.close();
@@ -50,14 +50,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 String myPath = database.getAbsolutePath();
                 Log.i("Database Path", myPath);
                 checkDB = SQLiteDatabase.openDatabase(myPath, null, SQLiteDatabase.OPEN_READWRITE);
-
                 if (doesTableExist(checkDB, "image_table")) {
                     Cursor c = checkDB.rawQuery("SELECT * FROM image_table ", null);
-                    Log.d(TAG, "DB has " + c.getCount() + " rows ");
+                    Log.i(TAG, "DB has " + c.getCount() + " rows ");
                 } else {
                     Log.i("TABLE", "Not Found");
                     Cursor c = checkDB.rawQuery(SQL_CREATE_ENTRIES, null);
-                    Log.d(TAG, "DB has " + c.getCount() + " rows ");
+                    Log.i(TAG, "DB has " + c.getCount() + " rows ");
                 }
             } else {
                 // Database does not exist so copy it from assets here
@@ -76,11 +75,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             String DB_FULL_PATH = DB_PATH + DB_NAME;
             File file = new File(DB_FULL_PATH);
             if (file.exists()) {
-                Log.d(TAG, "DB found ");
+                Log.i(TAG, "DB found ");
                 Cursor c = db.rawQuery("DROP TABLE image_table ", null);
-                Log.d(TAG, "TABLE DRPOPPED ");
+                Log.i(TAG, "TABLE DRPOPPED ");
             } else {
-                Log.d(TAG, "No DB found ");
+                Log.i(TAG, "No DB found ");
                 Cursor c = db.rawQuery("DROP TABLE image_table ", null);
             }
             db.close();
@@ -91,55 +90,40 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
     }
 
-    public int getDbRowCount() throws SQLException {
+    public Bitmap getLatestImage(SQLiteDatabase db) throws SQLException {
+        Bitmap bmp = null;
         try {
-            ArrayList arrayList = new ArrayList();
-
-            SQLiteDatabase db = this.getReadableDatabase();
-            Log.d(TAG, "Database Location :" + db.getPath());
-            String countQuery = "SELECT count(*) FROM image_table ";
-            Log.d(TAG, "QUERY:" + countQuery);
-
-            Cursor cursor = db.rawQuery(countQuery, null);
-            if (cursor.moveToFirst()) {
-                do {
-                    String trend = cursor.getString(1);
-                    arrayList.add(trend);
-                } while (cursor.moveToNext());
+            Cursor c = db.rawQuery("select * from image_table ORDER BY _id DESC", null);
+            if (c.moveToNext()) {
+                byte[] image = c.getBlob(1);
+                bmp = BitmapFactory.decodeByteArray(image, 0, image.length);
             }
-            cursor.close();
-            db.close();
-            Log.d(TAG, "Row Count: " + arrayList.size());
-            return arrayList.size();
+            return bmp;
         } catch (Exception e) {
             e.printStackTrace();
-            return -1;
+            return null;
+        } finally {
+            db.close();
         }
     }
 
-//    public int insertMultipleRows() throws SQLException {
-    //        try {
-    //            SQLiteDatabase db = this.getReadableDatabase();
-    //            Log.d(TAG, "Database Location :" + db.getPath());
-    //            String countQuery = "SELECT count(*) FROM image_table ";
-    //            Log.d(TAG, "QUERY:" + countQuery);
-    //
-    //            Cursor cursor = db.rawQuery(countQuery, null);
-    //            if (cursor.moveToFirst()) {
-    //                do {
-    //                    String trend = cursor.getString(1);
-    //                    arrayList.add(trend);
-    //                } while (cursor.moveToNext());
-    //            }
-    //            cursor.close();
-    //            db.close();
-    //            Log.d(TAG, "Row Count: " + arrayList.size());
-    //            return arrayList.size();
-    //        } catch (Exception e) {
-    //            e.printStackTrace();
-    //            return -1;
-    //        }
-    //    }
+    public Bitmap getRandomImage(SQLiteDatabase db) throws SQLException {
+        Bitmap bmp = null;
+        try {
+            int rand = new Random().nextInt(40) + 1;
+            Cursor c = db.rawQuery("select * from image_table where _id == " + rand, null);
+            if (c.moveToNext()) {
+                byte[] image = c.getBlob(1);
+                bmp = BitmapFactory.decodeByteArray(image, 0, image.length);
+            }
+            return bmp;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        } finally {
+            db.close();
+        }
+    }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
@@ -150,4 +134,25 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
     }
+
+    //    public long insertImage(Bitmap img) {
+    //        try {
+    //            byte[] data = getBitmapAsByteArray(img);
+    //            ContentValues values = new ContentValues();
+    //            values.put("image", data);
+    //            db = openOrCreateDatabase("image.db", Context.MODE_PRIVATE, null);
+    //            long rowid = db.insert("image_table", null, values);
+    //            if (rowid == -1) {
+    //                Log.i(TAG, "ERROR");
+    //            } else {
+    //                Log.i(TAG, "IMAGE INSERTED IN DB");
+    //            }
+    //            return rowid;
+    //        } catch (Exception e) {
+    //            e.printStackTrace();
+    //            return -1;
+    //        } finally {
+    //            db.close();
+    //        }
+    //    }
 }
