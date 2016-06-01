@@ -11,7 +11,6 @@ import android.graphics.BitmapFactory;
 import android.util.Log;
 
 import java.io.File;
-import java.util.Random;
 
 /**
  * Created by mmadhusoodan on 5/19/16.
@@ -59,7 +58,6 @@ public class DataBaseHelper extends SQLiteOpenHelper {
                     Log.i(TAG, "DB has " + c.getCount() + " rows ");
                 }
             } else {
-                // Database does not exist so copy it from assets here
                 Log.i("Database", "Not Found");
             }
         } catch (SQLiteException e) {
@@ -69,6 +67,29 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         return checkDB != null ? true : false;
     }
 
+    public int getDbRowCount() throws SQLException {
+
+        SQLiteDatabase db = null;
+        try {
+            File database = myContext.getDatabasePath(DB_NAME);
+            String myPath = database.getAbsolutePath();
+            db = SQLiteDatabase.openDatabase(myPath, null, SQLiteDatabase.OPEN_READWRITE);
+            Cursor c = db.rawQuery("select count(*) from image_table; ", null);
+
+            String strCount = "";
+            if (c.moveToFirst()) {
+                strCount = c.getString(c.getColumnIndex("count(*)"));
+            }
+            Log.i(TAG, "After Insert total rows " + strCount + " Rows");
+            int count = Integer.parseInt(strCount);
+            return count;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return -1;
+        } finally {
+            db.close();
+        }
+    }
 
     public boolean dropTable(SQLiteDatabase db) {
         try {
@@ -107,11 +128,10 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         }
     }
 
-    public Bitmap getRandomImage(SQLiteDatabase db) throws SQLException {
+    public Bitmap getImageN(SQLiteDatabase db, int rowId) throws SQLException {
         Bitmap bmp = null;
         try {
-            int rand = new Random().nextInt(40) + 1;
-            Cursor c = db.rawQuery("select * from image_table where _id == " + rand, null);
+            Cursor c = db.rawQuery("select * from image_table where _id == " + rowId, null);
             if (c.moveToNext()) {
                 byte[] image = c.getBlob(1);
                 bmp = BitmapFactory.decodeByteArray(image, 0, image.length);

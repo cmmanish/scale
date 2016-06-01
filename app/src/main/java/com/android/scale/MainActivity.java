@@ -18,12 +18,16 @@ import com.google.android.gms.vision.Frame;
 import com.google.android.gms.vision.face.Face;
 import com.google.android.gms.vision.face.FaceDetector;
 
+import java.util.Random;
+
 public class MainActivity extends Activity {
 
     private static final String TAG = "Log-MainActivity";
     private ImageView imageView1, imageView2;
     private TextView textView1, textView2;
     private SQLiteDatabase db;
+    private int maxRowCount = 500;
+    private volatile int imageRow = 500;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,8 +47,15 @@ public class MainActivity extends Activity {
         try {
             DataBaseHelper dataBaseHelper = new DataBaseHelper(getApplicationContext());
             db = this.openOrCreateDatabase("image.db", Context.MODE_PRIVATE, null);
-            Bitmap bmp = dataBaseHelper.getLatestImage(db);
-            imageView1.setImageBitmap(bmp);
+
+            Random rn = new Random();
+            int rowCount = dataBaseHelper.getDbRowCount();
+            int n = (rowCount < maxRowCount) ? rowCount : maxRowCount;
+
+            imageRow = rn.nextInt(n) + 1;
+
+            Bitmap myBitmap = dataBaseHelper.getImageN(db, imageRow);
+            imageView1.setImageBitmap(myBitmap);
             Toast.makeText(this, "DISPLAY Success", Toast.LENGTH_SHORT).show();
         } catch (Exception e) {
             e.printStackTrace();
@@ -55,10 +66,9 @@ public class MainActivity extends Activity {
 
     public void detectFaceInTheImage(View view) {
         try {
-
             DataBaseHelper dataBaseHelper = new DataBaseHelper(getApplicationContext());
             db = this.openOrCreateDatabase("image.db", Context.MODE_PRIVATE, null);
-            Bitmap myBitmap = dataBaseHelper.getLatestImage(db);
+            Bitmap myBitmap = dataBaseHelper.getImageN(db, imageRow);
 
             imageView2.setImageBitmap(myBitmap);
 
@@ -88,9 +98,12 @@ public class MainActivity extends Activity {
                 tempCanvas.drawRoundRect(new RectF(x1, y1, x2, y2), 2, 2, myRectPaint);
             }
             imageView2.setImageDrawable(new BitmapDrawable(getResources(), tempBitmap));
-            db.close();
+            Toast.makeText(this, faces.size() + " faces detected", Toast.LENGTH_SHORT).show();
+
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            db.close();
         }
     }
 }

@@ -31,8 +31,8 @@
                     android:layout_height="wrap_content"
                     android:id="@+id/textView1"
                     android:text="Actual Image"
-                    android:foreground="#eb0d0d"
-                    android:gravity="center"/>
+                    android:gravity="center"
+                    android:textColor="#070707"/>
 
         </LinearLayout>
 

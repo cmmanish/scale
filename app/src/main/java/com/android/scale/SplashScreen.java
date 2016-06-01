@@ -6,6 +6,7 @@ package com.android.scale;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -29,10 +30,10 @@ public class SplashScreen extends Activity {
     private static final String TAG = "Log-SplashScreen";
 
     private Instagram4J instagram4J = new Instagram4J();
-    private ArrayList<Bitmap> imageList = null;
     private SQLiteDatabase db;
     private String str = "Tendulkar";
     private ProgressDialog pd = null;
+    private boolean downloadFlag = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,11 +42,24 @@ public class SplashScreen extends Activity {
         try {
             DataBaseHelper dataBaseHelper = new DataBaseHelper(getApplicationContext());
             dataBaseHelper.checkDataBase();
-            this.pd = ProgressDialog.show(this, "Working Overtime", "Downloading Images...", true, false);
-            new DownloadTask().execute();
+            int rowCount = dataBaseHelper.getDbRowCount();
+
+            if (rowCount < 500) {
+                this.pd = ProgressDialog.show(this, "Working Overtime", "Downloading Images...", true, false);
+                new DownloadTask().execute();
+            }
+            startActivity(new Intent(SplashScreen.this, MainActivity.class));
+            Log.i(TAG, "Moving to MainActivity");
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // put your code here...
+
     }
 
     private boolean isNetworkAvailable() {
@@ -63,16 +77,16 @@ public class SplashScreen extends Activity {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            db = openOrCreateDatabase("image.db", Context.MODE_PRIVATE, null);
-            DataBaseHelper dataBaseHelper = new DataBaseHelper(getApplicationContext());
         }
 
         @Override
         protected Bitmap doInBackground(String... URL) {
             Bitmap bitmap = null;
+            ArrayList<Bitmap> imageList = null;
             try {
                 imageList = instagram4J.getBitmapsFromTagSearch(str);
                 Log.i(TAG, "Got ImageList From Instagram for  #" + str);
+                bitmap = imageList.get(imageList.size() - 1);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -81,10 +95,29 @@ public class SplashScreen extends Activity {
 
         @Override
         protected void onPostExecute(Bitmap result) {
-            dbInsertMultipleImages(imageList);
-            Log.i(TAG, "inserted Images to Db ");
-            startActivity(new Intent(SplashScreen.this, MainActivity.class));
-            Log.i(TAG, "Moving to MainActivity");
+            long rowId = dbInsertImage(result);
+            Log.i(TAG, "inserted " + rowId + " Image to Database ");
+        }
+    }
+
+    public long dbInsertImage(Bitmap myImage) {
+        try {
+            byte[] data = getBitmapAsByteArray(myImage);
+            ContentValues values = new ContentValues();
+            values.put("image", data);
+            db = openOrCreateDatabase("image.db", Context.MODE_PRIVATE, null);
+            long rowid = db.insert("image_table", null, values);
+            if (rowid == -1) {
+                Log.i(TAG, "ERROR");
+            } else {
+                Log.i(TAG, "IMAGE INSERTED IN DB : rowid " + rowid);
+            }
+            return rowid;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return -1;
+        } finally {
+            db.close();
         }
     }
 
