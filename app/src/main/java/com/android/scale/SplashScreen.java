@@ -19,6 +19,8 @@ import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+
 import com.android.scale.Backend.DataBaseHelper;
 import com.android.scale.Backend.Instagram4J;
 
@@ -28,7 +30,6 @@ import java.util.ArrayList;
 public class SplashScreen extends Activity {
 
     private static final String TAG = "Log-SplashScreen";
-
     private Instagram4J instagram4J = new Instagram4J();
     private SQLiteDatabase db;
     private String str = "Tendulkar";
@@ -39,26 +40,12 @@ public class SplashScreen extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
-        try {
-            DataBaseHelper dataBaseHelper = new DataBaseHelper(getApplicationContext());
-            dataBaseHelper.checkDataBase();
-            int rowCount = dataBaseHelper.getDbRowCount();
-
-            if (rowCount < 500) {
-                this.pd = ProgressDialog.show(this, "Working Overtime", "Downloading Images...", true, false);
-                new DownloadTask().execute();
-            }
-            startActivity(new Intent(SplashScreen.this, MainActivity.class));
-            Log.i(TAG, "Moving to MainActivity");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        // put your code here...
+        setContentView(R.layout.activity_splash);
 
     }
 
@@ -71,6 +58,37 @@ public class SplashScreen extends Activity {
             e.printStackTrace();
             return false;
         }
+    }
+
+    public void downloadImages(View view) {
+        try {
+            DataBaseHelper dataBaseHelper = new DataBaseHelper(getApplicationContext());
+            dataBaseHelper.checkDataBase();
+            int rowCount = dataBaseHelper.getDbRowCount();
+            if (isNetworkAvailable() && rowCount < 500) {
+                this.pd = ProgressDialog.show(this, "Working Overtime", "Downloading Images...", true, false);
+                new DownloadTask().execute();
+            }
+            startActivity(new Intent(SplashScreen.this, MainActivity.class));
+            Log.i(TAG, "Moving to MainActivity");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void deleteDatabaseRows(View view) {
+        try {
+            DataBaseHelper dataBaseHelper = new DataBaseHelper(getApplicationContext());
+            dataBaseHelper.checkDataBase();
+            int rowCount = dataBaseHelper.getDbRowCount();
+            dataBaseHelper.deleteRows();
+            Log.i(TAG, "Moving to MainActivity");
+
+        } catch (Exception e) {
+            startActivity(new Intent(SplashScreen.this, MainActivity.class));
+            e.printStackTrace();
+        }
+
     }
 
     private class DownloadTask extends AsyncTask<String, Void, Bitmap> {
@@ -86,6 +104,7 @@ public class SplashScreen extends Activity {
             try {
                 imageList = instagram4J.getBitmapsFromTagSearch(str);
                 Log.i(TAG, "Got ImageList From Instagram for  #" + str);
+                dbInsertMultipleImages(imageList);
                 bitmap = imageList.get(imageList.size() - 1);
             } catch (Exception e) {
                 e.printStackTrace();
