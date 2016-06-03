@@ -91,24 +91,24 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         }
     }
 
-    public boolean dropTable(SQLiteDatabase db) {
+    public boolean deleteRows() {
+        SQLiteDatabase db = null;
         try {
-            String DB_FULL_PATH = DB_PATH + DB_NAME;
-            File file = new File(DB_FULL_PATH);
-            if (file.exists()) {
-                Log.i(TAG, "DB found ");
-                Cursor c = db.rawQuery("DROP TABLE image_table ", null);
-                Log.i(TAG, "TABLE DRPOPPED ");
-            } else {
-                Log.i(TAG, "No DB found ");
-                Cursor c = db.rawQuery("DROP TABLE image_table ", null);
-            }
-            db.close();
+            File database = myContext.getDatabasePath(DB_NAME);
+            String myPath = database.getAbsolutePath();
+            db = SQLiteDatabase.openDatabase(myPath, null, SQLiteDatabase.OPEN_READWRITE);
+            Cursor c = db.rawQuery("DROP TABLE image_table ", null);
+            c.getCount();
+
             return true;
-        } catch (SQLiteException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return false;
+        } finally {
+            db.close();
         }
+
+
     }
 
     public Bitmap getLatestImage(SQLiteDatabase db) throws SQLException {

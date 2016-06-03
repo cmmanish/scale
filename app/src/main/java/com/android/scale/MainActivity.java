@@ -3,7 +3,11 @@ package com.android.scale;
 import android.app.Activity;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.*;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.os.StrictMode;
@@ -13,6 +17,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.android.scale.Backend.DataBaseHelper;
 import com.google.android.gms.vision.Frame;
 import com.google.android.gms.vision.face.Face;
@@ -28,6 +33,8 @@ public class MainActivity extends Activity {
     private SQLiteDatabase db;
     private int maxRowCount = 500;
     private volatile int imageRow = 500;
+    private int rowCount = 0;
+    private DataBaseHelper dataBaseHelper = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,15 +48,18 @@ public class MainActivity extends Activity {
 
         imageView2 = (ImageView) findViewById(R.id.imageView2);
         textView2 = (TextView) findViewById(R.id.textView2);
+
+        dataBaseHelper = new DataBaseHelper(getApplicationContext());
+        rowCount = dataBaseHelper.getDbRowCount();
     }
 
     public void fetchAndDisplayImage(View view) {
         try {
-            DataBaseHelper dataBaseHelper = new DataBaseHelper(getApplicationContext());
+            dataBaseHelper = new DataBaseHelper(getApplicationContext());
             db = this.openOrCreateDatabase("image.db", Context.MODE_PRIVATE, null);
 
             Random rn = new Random();
-            int rowCount = dataBaseHelper.getDbRowCount();
+            rowCount = dataBaseHelper.getDbRowCount();
             int n = (rowCount < maxRowCount) ? rowCount : maxRowCount;
 
             imageRow = rn.nextInt(n) + 1;
@@ -66,7 +76,7 @@ public class MainActivity extends Activity {
 
     public void detectFaceInTheImage(View view) {
         try {
-            DataBaseHelper dataBaseHelper = new DataBaseHelper(getApplicationContext());
+            dataBaseHelper = new DataBaseHelper(getApplicationContext());
             db = this.openOrCreateDatabase("image.db", Context.MODE_PRIVATE, null);
             Bitmap myBitmap = dataBaseHelper.getImageN(db, imageRow);
 

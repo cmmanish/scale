@@ -1,20 +1,11 @@
 .gradle
 /local.properties
-/.idea/workspace.xml
-/.idea/libraries
 .DS_Store
 /build
 /captures
 .idea/codeStyleSettings.xml
- app/build/*
-.idea/compiler.xml
-.idea/copyright/
-.idea/encodings.xml
-.idea/gradle.xml
-.idea/misc.xml
-.idea/runConfigurations.xml
-.idea/vcs.xml
+app/build/*
 app/src/test/
 gen/
 .idea/*
- app/app.iml
+app/app.iml

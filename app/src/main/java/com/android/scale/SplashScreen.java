@@ -13,54 +13,109 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
+import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Log;
+import android.view.View;
+import android.widget.ImageView;
 
 import com.android.scale.Backend.DataBaseHelper;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class SplashScreen extends Activity {
 
     private static final String TAG = "Log-SplashScreen";
+    static final int REQUEST_TAKE_PHOTO = 1;
+    private static final int CAMERA_REQUEST = 1888;
     private SQLiteDatabase db;
+    private File sourcePhotoFile = new File("");
+    private File destinationPhotoFile = new File("");
+    private ImageView myImage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
-        try {
-            DataBaseHelper dataBaseHelper = new DataBaseHelper(getApplicationContext());
-            dataBaseHelper.checkDataBase();
-            int rowCount = dataBaseHelper.getDbRowCount();
+        myImage = (ImageView) findViewById(R.id.imgLogo);
+        myImage.setBackgroundColor(Color.RED);
 
-
-            startActivity(new Intent(SplashScreen.this, MainActivity.class));
-            Log.i(TAG, "Moving to MainActivity");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        // put your code here...
-
+        setContentView(R.layout.activity_splash);
     }
 
-    private boolean isNetworkAvailable() {
+    public void captureSource(View view) {
         try {
-            ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-            NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-            return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+            Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+            startActivityForResult(cameraIntent, CAMERA_REQUEST);
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
         }
+    }
+
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        try {
+            if (requestCode == CAMERA_REQUEST && resultCode == RESULT_OK) {
+                Bitmap myBitmap = (Bitmap) data.getExtras().get("data");
+                myImage.setMaxWidth(20);
+                myImage.setBackgroundColor(Color.RED);
+                myImage.setImageBitmap(myBitmap);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void captureDestination(View view) {
+        try {
+            DataBaseHelper dataBaseHelper = new DataBaseHelper(getApplicationContext());
+            dataBaseHelper.checkDataBase();
+            int rowCount = dataBaseHelper.getDbRowCount();
+            dataBaseHelper.deleteRows();
+            Log.i(TAG, "Moving to MainActivity");
+
+        } catch (Exception e) {
+            startActivity(new Intent(SplashScreen.this, MainActivity.class));
+            e.printStackTrace();
+        }
+    }
+
+    private File dispatchTakePictureIntent() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        // Ensure that there's a camera activity to handle the intent
+        //     File sourcePhotoFile = null;
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            // Create the File where the photo should go
+            try {
+                sourcePhotoFile = createImageFile();
+            } catch (IOException ex) {
+                // Error occurred while creating the File
+                Log.i(TAG, "Exception thrown in dispatchTakePictureIntent()" + ex.toString());
+            }
+            // Continue only if the File was successfully created
+            if (sourcePhotoFile != null) {
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(sourcePhotoFile));
+                startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
+            }
+        }
+        return sourcePhotoFile;
+    }
+
+    private File createImageFile() throws IOException {
+        // Create an image file name
+        File file = new File("/storage/emulated/legacy/Pictures");
+        String imageFileName = "FromAndroid_";
+        File image = File.createTempFile(imageFileName, ".jpg", file);
+        return image;
     }
 
     public long dbInsertImage(Bitmap myImage) {
