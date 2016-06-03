@@ -5,7 +5,6 @@ package com.android.scale;
  */
 
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -16,11 +15,10 @@ import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+
 import com.android.scale.Backend.DataBaseHelper;
-import com.android.scale.Backend.Instagram4J;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
@@ -28,12 +26,7 @@ import java.util.ArrayList;
 public class SplashScreen extends Activity {
 
     private static final String TAG = "Log-SplashScreen";
-
-    private Instagram4J instagram4J = new Instagram4J();
     private SQLiteDatabase db;
-    private String str = "Tendulkar";
-    private ProgressDialog pd = null;
-    private boolean downloadFlag = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,10 +37,7 @@ public class SplashScreen extends Activity {
             dataBaseHelper.checkDataBase();
             int rowCount = dataBaseHelper.getDbRowCount();
 
-            if (rowCount < 500) {
-                this.pd = ProgressDialog.show(this, "Working Overtime", "Downloading Images...", true, false);
-                new DownloadTask().execute();
-            }
+
             startActivity(new Intent(SplashScreen.this, MainActivity.class));
             Log.i(TAG, "Moving to MainActivity");
         } catch (Exception e) {
@@ -70,33 +60,6 @@ public class SplashScreen extends Activity {
         } catch (Exception e) {
             e.printStackTrace();
             return false;
-        }
-    }
-
-    private class DownloadTask extends AsyncTask<String, Void, Bitmap> {
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-        }
-
-        @Override
-        protected Bitmap doInBackground(String... URL) {
-            Bitmap bitmap = null;
-            ArrayList<Bitmap> imageList = null;
-            try {
-                imageList = instagram4J.getBitmapsFromTagSearch(str);
-                Log.i(TAG, "Got ImageList From Instagram for  #" + str);
-                bitmap = imageList.get(imageList.size() - 1);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            return bitmap;
-        }
-
-        @Override
-        protected void onPostExecute(Bitmap result) {
-            long rowId = dbInsertImage(result);
-            Log.i(TAG, "inserted " + rowId + " Image to Database ");
         }
     }
 
