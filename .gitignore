@@ -7,3 +7,14 @@
 /captures
 .idea/codeStyleSettings.xml
  app/build/*
+.idea/compiler.xml
+.idea/copyright/
+.idea/encodings.xml
+.idea/gradle.xml
+.idea/misc.xml
+.idea/runConfigurations.xml
+.idea/vcs.xml
+app/src/test/
+gen/
+.idea/*
+ app/app.iml
