@@ -22,7 +22,7 @@ public class Instagram4J {
 
     final private static Logger log = Logger.getLogger(Instagram4J.class);
     private static final String TAG = "Log-Instagram4J";
-    private static final String ACCESS_TOKEN = "226613286.379d744.5cd6302526ca4ca382c3838377b6d62d";
+    private static final String ACCESS_TOKEN = "226613286.a60a41e.872ee12ae47243458045e72a9a08b009";
 
     public static ArrayList<Bitmap> getBitmapFromURLList(ArrayList<String> imgURLList) {
         try {
