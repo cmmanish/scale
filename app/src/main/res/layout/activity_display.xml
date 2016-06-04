@@ -68,16 +68,6 @@
             android:background="#c9cfcf">
 
         <Button
-                android:id="@+id/insert"
-                android:layout_weight="1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Fetch n Display"
-                android:background="#c9cfcf"
-                android:onClick="fetchAndDisplayImage"
-                android:textColor="#010101"/>
-
-        <Button
                 android:id="@+id/display"
                 android:layout_weight="1"
                 android:layout_width="wrap_content"

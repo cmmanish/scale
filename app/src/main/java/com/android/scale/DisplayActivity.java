@@ -1,7 +1,6 @@
 package com.android.scale;
 
 import android.app.Activity;
-import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -23,17 +22,13 @@ import com.google.android.gms.vision.Frame;
 import com.google.android.gms.vision.face.Face;
 import com.google.android.gms.vision.face.FaceDetector;
 
-import java.util.Random;
+public class DisplayActivity extends Activity {
 
-public class MainActivity extends Activity {
-
-    private static final String TAG = "Log-MainActivity";
+    private static final String TAG = "Log-DisplayActivity";
     private ImageView imageView1, imageView2;
     private TextView textView1, textView2;
     private SQLiteDatabase db;
-    private int maxRowCount = 500;
     private volatile int imageRow = 500;
-    private int rowCount = 0;
     private DataBaseHelper dataBaseHelper = null;
 
     @Override
@@ -41,7 +36,7 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_display);
 
         imageView1 = (ImageView) findViewById(R.id.imageView1);
         textView1 = (TextView) findViewById(R.id.textView1);
@@ -50,46 +45,23 @@ public class MainActivity extends Activity {
         textView2 = (TextView) findViewById(R.id.textView2);
 
         dataBaseHelper = new DataBaseHelper(getApplicationContext());
-        rowCount = dataBaseHelper.getDbRowCount();
-    }
-
-    public void fetchAndDisplayImage(View view) {
-        try {
-            dataBaseHelper = new DataBaseHelper(getApplicationContext());
-            db = this.openOrCreateDatabase("image.db", Context.MODE_PRIVATE, null);
-
-            Random rn = new Random();
-            rowCount = dataBaseHelper.getDbRowCount();
-            int n = (rowCount < maxRowCount) ? rowCount : maxRowCount;
-
-            imageRow = rn.nextInt(n) + 1;
-
-            Bitmap myBitmap = dataBaseHelper.getImageN(db, imageRow);
-            imageView1.setImageBitmap(myBitmap);
-            Toast.makeText(this, "DISPLAY Success", Toast.LENGTH_SHORT).show();
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            db.close();
-        }
+        Bitmap dbBitmap = dataBaseHelper.getLatestImage();
+        imageView1.setImageBitmap(dbBitmap);
     }
 
     public void detectFaceInTheImage(View view) {
         try {
-            dataBaseHelper = new DataBaseHelper(getApplicationContext());
-            db = this.openOrCreateDatabase("image.db", Context.MODE_PRIVATE, null);
-            Bitmap myBitmap = dataBaseHelper.getImageN(db, imageRow);
-
-            imageView2.setImageBitmap(myBitmap);
+            Bitmap dbBitmap = dataBaseHelper.getLatestImage();
+            imageView2.setImageBitmap(dbBitmap);
 
             Paint myRectPaint = new Paint();
             myRectPaint.setStrokeWidth(5);
             myRectPaint.setColor(Color.RED);
             myRectPaint.setStyle(Paint.Style.STROKE);
 
-            Bitmap tempBitmap = Bitmap.createBitmap(myBitmap.getWidth(), myBitmap.getHeight(), Bitmap.Config.RGB_565);
+            Bitmap tempBitmap = Bitmap.createBitmap(dbBitmap.getWidth(), dbBitmap.getHeight(), Bitmap.Config.RGB_565);
             Canvas tempCanvas = new Canvas(tempBitmap);
-            tempCanvas.drawBitmap(myBitmap, 0, 0, null);
+            tempCanvas.drawBitmap(dbBitmap, 0, 0, null);
 
             FaceDetector faceDetector = new FaceDetector.Builder(getApplicationContext()).setTrackingEnabled(false).build();
             if (!faceDetector.isOperational()) {
@@ -97,7 +69,7 @@ public class MainActivity extends Activity {
                 return;
             }
 
-            Frame frame = new Frame.Builder().setBitmap(myBitmap).build();
+            Frame frame = new Frame.Builder().setBitmap(dbBitmap).build();
             SparseArray<Face> faces = faceDetector.detect(frame);
             for (int i = 0; i < faces.size(); i++) {
                 Face thisFace = faces.valueAt(i);
@@ -112,8 +84,6 @@ public class MainActivity extends Activity {
 
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            db.close();
         }
     }
 }

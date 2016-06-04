@@ -20,7 +20,6 @@ import java.io.File;
 public class DataBaseHelper extends SQLiteOpenHelper {
 
     private static final String TAG = "Log-DataBaseHelper";
-    //private static String DB_PATH = "/data/data/com.android.scale/databases/";
     private static String DB_NAME = "image.db";
     private final Context myContext;
     private String SQL_CREATE_ENTRIES = "CREATE TABLE image_table (_id INTEGER PRIMARY KEY AUTOINCREMENT,image BLOB)";
@@ -35,9 +34,6 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         database.execSQL(SQL_CREATE_ENTRIES);
     }
 
-    /**
-     * Handles the table version and the drop of a table.
-     */
     @Override
     public void onUpgrade(SQLiteDatabase database, int oldVersion, int newVersion) {
         Log.w(DataBaseHelper.class.getName(), "Upgrading database from version" + oldVersion + "to " + newVersion + ", which will destroy all old data");
@@ -59,17 +55,15 @@ public class DataBaseHelper extends SQLiteOpenHelper {
             values.put("image", data);
             db = SQLiteDatabase.openDatabase(myPath, null, SQLiteDatabase.OPEN_READWRITE);
             long rowid = db.insert("image_table", null, values);
-            if (rowid == -1) {
-                Log.i(TAG, "ERROR");
-            } else {
+            if (rowid != -1) {
                 Log.i(TAG, "IMAGE INSERTED IN DB : rowid " + rowid);
+            } else {
+                Log.i(TAG, "ERROR");
             }
             return rowid;
         } catch (Exception e) {
             e.printStackTrace();
             return -1;
-        } finally {
-            db.close();
         }
     }
 
@@ -129,9 +123,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         try {
             File database = myContext.getDatabasePath(DB_NAME);
             String myPath = database.getAbsolutePath();
-            db = SQLiteDatabase.openDatabase(myPath, null, SQLiteDatabase.OPEN_READWRITE);
             Cursor c = db.rawQuery("select count(*) from image_table; ", null);
-
             String strCount = "";
             if (c.moveToFirst()) {
                 strCount = c.getString(c.getColumnIndex("count(*)"));
@@ -142,8 +134,6 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         } catch (Exception e) {
             e.printStackTrace();
             return -1;
-        } finally {
-            db.close();
         }
     }
 
@@ -154,17 +144,12 @@ public class DataBaseHelper extends SQLiteOpenHelper {
             String myPath = database.getAbsolutePath();
             db = SQLiteDatabase.openDatabase(myPath, null, SQLiteDatabase.OPEN_READWRITE);
             Cursor c = db.rawQuery("DROP TABLE image_table ", null);
-            c.getCount();
-
+            Log.i(TAG, c.getCount() + " Rows in Db now");
             return true;
         } catch (Exception e) {
             e.printStackTrace();
             return false;
-        } finally {
-            db.close();
         }
-
-
     }
 
     public Bitmap getLatestImage() throws SQLException {
@@ -183,8 +168,6 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         } catch (Exception e) {
             e.printStackTrace();
             return null;
-        } finally {
-            db.close();
         }
     }
 
@@ -200,30 +183,37 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         } catch (Exception e) {
             e.printStackTrace();
             return null;
-        } finally {
-            db.close();
         }
     }
 
-
-    //    public long insertImage(Bitmap img) {
-    //        try {
-    //            byte[] data = getBitmapAsByteArray(img);
-    //            ContentValues values = new ContentValues();
-    //            values.put("image", data);
-    //            db = openOrCreateDatabase("image.db", Context.MODE_PRIVATE, null);
-    //            long rowid = db.insert("image_table", null, values);
-    //            if (rowid == -1) {
-    //                Log.i(TAG, "ERROR");
-    //            } else {
-    //                Log.i(TAG, "IMAGE INSERTED IN DB");
-    //            }
-    //            return rowid;
-    //        } catch (Exception e) {
-    //            e.printStackTrace();
-    //            return -1;
-    //        } finally {
-    //            db.close();
-    //        }
-    //    }
+//    public boolean dbInsertMultipleImages(ArrayList<Bitmap> imageList) {
+//        try {
+//            db = openOrCreateDatabase("image.db", Context.MODE_PRIVATE, null);
+//            String sql = "INSERT INTO image_table ('image')" + "VALUES (?);";
+//            SQLiteStatement statement = db.compileStatement(sql);
+//            db.beginTransaction();
+//            for (int i = 0; i < imageList.size(); i++) {
+//                Bitmap myImage = imageList.get(i);
+//                byte[] data = dataBaseHelper.getBitmapAsByteArray(myImage);
+//                statement.clearBindings();
+//                statement.bindBlob(1, data);
+//                statement.execute();
+//            }
+//            db.setTransactionSuccessful();
+//            db.endTransaction();
+//            Cursor c = db.rawQuery("select count(*) from image_table; ", null);
+//
+//            String strCount = "";
+//            if (c.moveToFirst()) {
+//                strCount = c.getString(c.getColumnIndex("count(*)"));
+//            }
+//            Log.i(TAG, "After Insert total rows " + strCount + " Rows");
+//            return true;
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            return false;
+//        } finally {
+//            db.close();
+//        }
+//    }
 }

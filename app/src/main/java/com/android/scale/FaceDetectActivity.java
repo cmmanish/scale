@@ -19,7 +19,7 @@ public class FaceDetectActivity extends Activity {
         super.onCreate(savedInstanceState);
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_display);
 
         Button btn = (Button) findViewById(R.id.button);
         btn.setOnClickListener(new View.OnClickListener() {
