@@ -17,11 +17,10 @@
 
             <ImageView
                 android:id="@+id/imgLogo"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:layout_weight="7"
-                android:src="@drawable/piratey" />
+                android:layout_height="match_parent"
+                android:src="@drawable/piratey"
+                android:layout_weight="1"
+                android:layout_width="wrap_content" />
 
         </LinearLayout>
 
@@ -35,7 +34,7 @@
                 android:id="@+id/button1"
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
-                android:onClick="captureSource"
+                android:onClick="captureSourceImage"
                 android:text="Capture Source"
                 android:layout_weight="1" />
 

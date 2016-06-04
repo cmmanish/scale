@@ -1,5 +1,6 @@
 package com.android.scale.Backend;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
@@ -10,6 +11,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Log;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 
 /**
@@ -18,7 +20,7 @@ import java.io.File;
 public class DataBaseHelper extends SQLiteOpenHelper {
 
     private static final String TAG = "Log-DataBaseHelper";
-    private static String DB_PATH = "/data/data/com.android.scale/databases/";
+    //private static String DB_PATH = "/data/data/com.android.scale/databases/";
     private static String DB_NAME = "image.db";
     private final Context myContext;
     private String SQL_CREATE_ENTRIES = "CREATE TABLE image_table (_id INTEGER PRIMARY KEY AUTOINCREMENT,image BLOB)";
@@ -26,6 +28,60 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     public DataBaseHelper(Context context) {
         super(context, DB_NAME, null, 1);
         this.myContext = context;
+    }
+
+    @Override
+    public void onCreate(SQLiteDatabase database) {
+        database.execSQL(SQL_CREATE_ENTRIES);
+    }
+
+    /**
+     * Handles the table version and the drop of a table.
+     */
+    @Override
+    public void onUpgrade(SQLiteDatabase database, int oldVersion, int newVersion) {
+        Log.w(DataBaseHelper.class.getName(), "Upgrading database from version" + oldVersion + "to " + newVersion + ", which will destroy all old data");
+        database.execSQL("DROP TABLE IF EXISTS user");
+        onCreate(database);
+    }
+
+    public Cursor getAll() {
+        return (getReadableDatabase().rawQuery("SELECT _id, image,  FROM image_table ORDER BY name", null));
+    }
+
+    public long dbInsertImage(Bitmap myImage) {
+        SQLiteDatabase db = null;
+        try {
+            File database = myContext.getDatabasePath(DB_NAME);
+            String myPath = database.getAbsolutePath();
+            byte[] data = getBitmapAsByteArray(myImage);
+            ContentValues values = new ContentValues();
+            values.put("image", data);
+            db = SQLiteDatabase.openDatabase(myPath, null, SQLiteDatabase.OPEN_READWRITE);
+            long rowid = db.insert("image_table", null, values);
+            if (rowid == -1) {
+                Log.i(TAG, "ERROR");
+            } else {
+                Log.i(TAG, "IMAGE INSERTED IN DB : rowid " + rowid);
+            }
+            return rowid;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return -1;
+        } finally {
+            db.close();
+        }
+    }
+
+    public static byte[] getBitmapAsByteArray(Bitmap bitmap) {
+        try {
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.PNG, 0, outputStream);
+            return outputStream.toByteArray();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public boolean doesTableExist(SQLiteDatabase db, String tableName) {
@@ -111,9 +167,13 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
     }
 
-    public Bitmap getLatestImage(SQLiteDatabase db) throws SQLException {
+    public Bitmap getLatestImage() throws SQLException {
         Bitmap bmp = null;
+        SQLiteDatabase db = null;
         try {
+            File database = myContext.getDatabasePath(DB_NAME);
+            String myPath = database.getAbsolutePath();
+            db = SQLiteDatabase.openDatabase(myPath, null, SQLiteDatabase.OPEN_READWRITE);
             Cursor c = db.rawQuery("select * from image_table ORDER BY _id DESC", null);
             if (c.moveToNext()) {
                 byte[] image = c.getBlob(1);
@@ -145,15 +205,6 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         }
     }
 
-    @Override
-    public void onCreate(SQLiteDatabase db) {
-
-    }
-
-    @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-
-    }
 
     //    public long insertImage(Bitmap img) {
     //        try {
