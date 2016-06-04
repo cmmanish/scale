@@ -20,7 +20,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:src="@drawable/how_tall_are_you" />
+                android:src="@drawable/detect_faces" />
 
         </LinearLayout>
 
@@ -38,15 +38,6 @@
                 android:onClick="captureImage"
                 android:src="@drawable/camera" />
 
-            <Button
-                android:id="@+id/button2"
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:layout_weight="1"
-                android:onClick="clearDb"
-                android:text="clearDb" />
         </LinearLayout>
-
-
     </LinearLayout>
 </RelativeLayout>

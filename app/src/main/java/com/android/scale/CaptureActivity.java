@@ -10,12 +10,10 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.android.scale.Backend.DataBaseHelper;
 
 public class CaptureActivity extends Activity {
-
     private static final String TAG = "Log-CaptureActivity";
     private static final int CAMERA_REQUEST = 1888;
     private ImageView imgLogo = null;
@@ -48,20 +46,9 @@ public class CaptureActivity extends Activity {
     public void captureImage(View view) {
         try {
             Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+            cameraIntent.putExtra("android.intent.extras.CAMERA_FACING", 1);
             startActivityForResult(cameraIntent, CAMERA_REQUEST);
         } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void clearDb(View view) {
-        try {
-            dataBaseHelper = new DataBaseHelper(this);
-            if (dataBaseHelper.deleteRows()) {
-                Toast.makeText(this, "Database CLEAN", Toast.LENGTH_SHORT).show();
-            }
-        } catch (Exception e) {
-            startActivity(new Intent(CaptureActivity.this, DisplayActivity.class));
             e.printStackTrace();
         }
     }

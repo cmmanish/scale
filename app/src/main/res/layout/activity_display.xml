@@ -61,22 +61,4 @@
         </LinearLayout>
     </LinearLayout>
 
-    <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:background="#c9cfcf">
-
-        <Button
-                android:id="@+id/display"
-                android:layout_weight="1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="fill_vertical"
-                android:text="Detect Face"
-                android:background="#c9cfcf"
-                android:onClick="detectFaceInTheImage"
-                android:textColor="#010101"/>
-    </LinearLayout>
-
 </LinearLayout>

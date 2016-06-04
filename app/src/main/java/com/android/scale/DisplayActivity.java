@@ -1,7 +1,6 @@
 package com.android.scale;
 
 import android.app.Activity;
-import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -12,7 +11,6 @@ import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.v7.app.AlertDialog;
 import android.util.SparseArray;
-import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -27,8 +25,6 @@ public class DisplayActivity extends Activity {
     private static final String TAG = "Log-DisplayActivity";
     private ImageView imageView1, imageView2;
     private TextView textView1, textView2;
-    private SQLiteDatabase db;
-    private volatile int imageRow = 500;
     private DataBaseHelper dataBaseHelper = null;
 
     @Override
@@ -47,9 +43,11 @@ public class DisplayActivity extends Activity {
         dataBaseHelper = new DataBaseHelper(getApplicationContext());
         Bitmap dbBitmap = dataBaseHelper.getLatestImage();
         imageView1.setImageBitmap(dbBitmap);
+
+        detectFaceInTheImage();
     }
 
-    public void detectFaceInTheImage(View view) {
+    public void detectFaceInTheImage() {
         try {
             Bitmap dbBitmap = dataBaseHelper.getLatestImage();
             imageView2.setImageBitmap(dbBitmap);
