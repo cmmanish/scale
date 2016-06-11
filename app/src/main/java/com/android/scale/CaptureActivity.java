@@ -25,7 +25,7 @@ public class CaptureActivity extends Activity {
         setContentView(R.layout.activity_capture);
         imgLogo = (ImageView) findViewById(R.id.imgLogo);
         DataBaseHelper dataBaseHelper = new DataBaseHelper(this);
-        dataBaseHelper.checkDataBase();
+        dataBaseHelper.getWritableDatabase();
     }
 
     @Override

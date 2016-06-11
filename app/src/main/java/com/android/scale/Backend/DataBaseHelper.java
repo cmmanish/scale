@@ -30,15 +30,16 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     }
 
     @Override
-    public void onCreate(SQLiteDatabase database) {
-        database.execSQL(SQL_CREATE_ENTRIES);
+    public void onCreate(SQLiteDatabase db) {
+        db.execSQL(SQL_CREATE_ENTRIES);
+        Log.i(TAG,"onCreate");
     }
 
     @Override
-    public void onUpgrade(SQLiteDatabase database, int oldVersion, int newVersion) {
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         Log.w(DataBaseHelper.class.getName(), "Upgrading database from version" + oldVersion + "to " + newVersion + ", which will destroy all old data");
-        database.execSQL("DROP TABLE IF EXISTS user");
-        onCreate(database);
+        db.execSQL("DROP TABLE IF EXISTS user");
+        onCreate(db);
     }
 
     public Cursor getAll() {
