@@ -30,11 +30,21 @@
             android:layout_weight="1"
             android:orientation="horizontal">
 
+            <TextView
+                android:id="@+id/cityState"
+                android:layout_width="fill_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:enabled="true"
+                android:text="A:"
+                android:textColor="#d80d0d" />
+
             <ImageButton
                 android:id="@+id/imageButton"
-                android:layout_width="fill_parent"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="3"
+                android:layout_weight="2"
                 android:onClick="captureImage"
                 android:src="@drawable/camera" />
 

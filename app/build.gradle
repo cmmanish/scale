@@ -34,4 +34,6 @@ dependencies {
     compile 'com.daimajia.slider:library:1.1.5@aar'
     compile 'log4j:log4j:1.2.17'
     compile 'com.google.android.gms:play-services:8.4.0'
+    compile 'com.google.android.gms:play-services-location:8.4.0'
+
 }
