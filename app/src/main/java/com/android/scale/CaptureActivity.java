@@ -6,6 +6,7 @@ package com.android.scale;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.View;
@@ -18,6 +19,7 @@ public class CaptureActivity extends Activity {
     private static final int CAMERA_REQUEST = 1888;
     private ImageView imgLogo = null;
     DataBaseHelper dataBaseHelper = null;
+    private SQLiteDatabase sqlDb;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,7 +27,7 @@ public class CaptureActivity extends Activity {
         setContentView(R.layout.activity_capture);
         imgLogo = (ImageView) findViewById(R.id.imgLogo);
         DataBaseHelper dataBaseHelper = new DataBaseHelper(this);
-        dataBaseHelper.getWritableDatabase();
+        sqlDb = dataBaseHelper.getWritableDatabase();
     }
 
     @Override
@@ -58,7 +60,7 @@ public class CaptureActivity extends Activity {
             if (requestCode == CAMERA_REQUEST && resultCode == RESULT_OK) {
                 Bitmap myBitmap = (Bitmap) data.getExtras().get("data");
                 dataBaseHelper = new DataBaseHelper(this);
-                dataBaseHelper.dbInsertImage(myBitmap);
+                dataBaseHelper.dbInsertImage(sqlDb, myBitmap);
                 startActivity(new Intent(CaptureActivity.this, DisplayActivity.class));
             }
         } catch (Exception e) {

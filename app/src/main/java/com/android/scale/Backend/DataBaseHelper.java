@@ -32,7 +32,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(SQL_CREATE_ENTRIES);
-        Log.i(TAG,"onCreate");
+        Log.i(TAG, "onCreate");
     }
 
     @Override
@@ -46,15 +46,14 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         return (getReadableDatabase().rawQuery("SELECT _id, image,  FROM image_table ORDER BY name", null));
     }
 
-    public long dbInsertImage(Bitmap myImage) {
-        SQLiteDatabase db = null;
+    public long dbInsertImage(SQLiteDatabase db, Bitmap myImage) {
         try {
             File database = myContext.getDatabasePath(DB_NAME);
             String myPath = database.getAbsolutePath();
             byte[] data = getBitmapAsByteArray(myImage);
             ContentValues values = new ContentValues();
             values.put("image", data);
-            db = SQLiteDatabase.openDatabase(myPath, null, SQLiteDatabase.OPEN_READWRITE);
+            //db = SQLiteDatabase.openDatabase(myPath, null, SQLiteDatabase.OPEN_READWRITE);
             long rowid = db.insert("image_table", null, values);
             if (rowid != -1) {
                 Log.i(TAG, "IMAGE INSERTED IN DB : rowid " + rowid);
@@ -153,9 +152,8 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         }
     }
 
-    public Bitmap getLatestImage() throws SQLException {
+    public Bitmap getLatestImage(SQLiteDatabase db) throws SQLException {
         Bitmap bmp = null;
-        SQLiteDatabase db = null;
         try {
             File database = myContext.getDatabasePath(DB_NAME);
             String myPath = database.getAbsolutePath();

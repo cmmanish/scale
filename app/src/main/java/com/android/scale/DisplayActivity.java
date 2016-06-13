@@ -1,6 +1,7 @@
 package com.android.scale;
 
 import android.app.Activity;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -26,6 +27,7 @@ public class DisplayActivity extends Activity {
     private ImageView imageView1, imageView2;
     private TextView textView1, textView2;
     private DataBaseHelper dataBaseHelper = null;
+    private SQLiteDatabase sqlDb;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,15 +43,16 @@ public class DisplayActivity extends Activity {
         textView2 = (TextView) findViewById(R.id.textView2);
 
         dataBaseHelper = new DataBaseHelper(getApplicationContext());
-        Bitmap dbBitmap = dataBaseHelper.getLatestImage();
+        sqlDb = dataBaseHelper.getWritableDatabase();
+        Bitmap dbBitmap = dataBaseHelper.getLatestImage(sqlDb);
         imageView1.setImageBitmap(dbBitmap);
 
-        detectFaceInTheImage();
+        //detectFaceInTheImage();
     }
 
     public void detectFaceInTheImage() {
         try {
-            Bitmap dbBitmap = dataBaseHelper.getLatestImage();
+            Bitmap dbBitmap = dataBaseHelper.getLatestImage(sqlDb);
             imageView2.setImageBitmap(dbBitmap);
 
             Paint myRectPaint = new Paint();
