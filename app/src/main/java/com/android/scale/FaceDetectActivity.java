@@ -1,13 +1,11 @@
 package com.android.scale;
 
 import android.app.Activity;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
+import android.widget.TextView;
 
 /**
  * Created by mmadhusoodan on 5/23/16.
@@ -29,11 +27,8 @@ public class FaceDetectActivity extends Activity {
 
         });
 
-        ImageView myImageView = (ImageView) findViewById(R.id.imgview);
-
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inMutable = true;
-        Bitmap myBitmap = BitmapFactory.decodeResource(getApplicationContext().getResources(), R.drawable.test1, options);
+        TextView textView = (TextView) findViewById(R.id.textView1);
+        textView.setText("HELLO");
 
     }
 }
