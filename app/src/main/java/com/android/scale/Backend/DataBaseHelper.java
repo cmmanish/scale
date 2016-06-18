@@ -48,12 +48,9 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
     public long dbInsertImage(SQLiteDatabase db, Bitmap myImage) {
         try {
-            File database = myContext.getDatabasePath(DB_NAME);
-            String myPath = database.getAbsolutePath();
             byte[] data = getBitmapAsByteArray(myImage);
             ContentValues values = new ContentValues();
             values.put("image", data);
-            //db = SQLiteDatabase.openDatabase(myPath, null, SQLiteDatabase.OPEN_READWRITE);
             long rowid = db.insert("image_table", null, values);
             if (rowid != -1) {
                 Log.i(TAG, "IMAGE INSERTED IN DB : rowid " + rowid);
@@ -117,19 +114,13 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         return checkDB != null ? true : false;
     }
 
-    public int getDbRowCount() throws SQLException {
+    public int getRowCount(SQLiteDatabase db, String tableName) throws SQLException {
 
-        SQLiteDatabase db = null;
+        int count = 0;
         try {
-            File database = myContext.getDatabasePath(DB_NAME);
-            String myPath = database.getAbsolutePath();
-            Cursor c = db.rawQuery("select count(*) from image_table; ", null);
-            String strCount = "";
-            if (c.moveToFirst()) {
-                strCount = c.getString(c.getColumnIndex("count(*)"));
-            }
-            Log.i(TAG, "After Insert total rows " + strCount + " Rows");
-            int count = Integer.parseInt(strCount);
+            Cursor c = db.rawQuery("SELECT * FROM image_table; ", null);
+            Log.i(TAG, "DB has " + c.getCount() + " rows ");
+            count = c.getCount();
             return count;
         } catch (Exception e) {
             e.printStackTrace();

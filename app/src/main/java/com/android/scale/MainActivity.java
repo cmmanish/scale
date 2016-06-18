@@ -12,6 +12,7 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
@@ -22,12 +23,14 @@ import android.widget.Toast;
 
 import com.android.scale.Backend.DataBaseHelper;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
 public class MainActivity extends Activity {
 
     private static final String TAG = "Log-MainActivity";
+    private static final int REQUEST_CODE_SOME_FEATURES_PERMISSIONS = 0;
     private static final int INITIAL_REQUEST = 1337;
     private static final int CAMERA_REQUEST = INITIAL_REQUEST + 1;
     private static final String[] INITIAL_PERMS = {
@@ -46,12 +49,59 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+
+            int hasWritePermission = checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+            int hasReadPermission = checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE);
+            int hasLocationPermission = checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION);
+
+            List<String> permissions = new ArrayList<String>();
+            if (hasWritePermission != PackageManager.PERMISSION_GRANTED) {
+                permissions.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+            }
+            if (hasReadPermission != PackageManager.PERMISSION_GRANTED) {
+                permissions.add(Manifest.permission.READ_EXTERNAL_STORAGE);
+            }
+            if (hasLocationPermission != PackageManager.PERMISSION_GRANTED) {
+                permissions.add(Manifest.permission.ACCESS_FINE_LOCATION);
+            }
+            if (!permissions.isEmpty()) {
+                requestPermissions(permissions.toArray(new String[permissions.size()]), REQUEST_CODE_SOME_FEATURES_PERMISSIONS);
+            }
+        }
+//        else {
+//            setCityStateZipcode();
+//        }
+
         imgLogo = (ImageView) findViewById(R.id.imgLogo);
         cityText = (TextView) findViewById(R.id.cityTextView);
-        setCityStateZipcode();
+
         DataBaseHelper dataBaseHelper = new DataBaseHelper(this);
         sqlDb = dataBaseHelper.getWritableDatabase();
 
+        Log.i(TAG, "DB: " + dataBaseHelper.doesTableExist(sqlDb, "image_table"));
+        Log.i(TAG, "DB Rows: " + dataBaseHelper.getRowCount(sqlDb, "image_table"));
+
+
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        switch (requestCode) {
+            case REQUEST_CODE_SOME_FEATURES_PERMISSIONS: {
+                for (int i = 0; i < permissions.length; i++) {
+                    if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
+                        Log.i(TAG, "Permissions --> " + "Permission Granted: " + permissions[i]);
+                    } else if (grantResults[i] == PackageManager.PERMISSION_DENIED) {
+                        Log.i(TAG, "Permissions --> " + "Permission Denied: " + permissions[i]);
+                    }
+                }
+            }
+            break;
+            default: {
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+            }
+        }
     }
 
     public void captureImage(View view) {
@@ -78,13 +128,10 @@ public class MainActivity extends Activity {
     }
 
     public void setCityStateZipcode() {
-
         try {
-
             if (!canAccessLocation() || !canAccessContacts()) {
                 requestPermissions(INITIAL_PERMS, INITIAL_REQUEST);
             }
-
             LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                     && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
